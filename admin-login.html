@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Edygrim DJ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 16px;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-with-icon input.error {
+            border-color: #dc3545;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: rgb(155, 60, 60);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .login-btn i {
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #f5c6cb;
+            font-size: 14px;
+        }
+
+        .error-message i {
+            margin-right: 8px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('⚠️ IMPORTANT:\n\nYou are opening this file directly (file://).\nAuthentication will NOT work due to browser security restrictions.\n\nPlease use "Live Server" or a local HTTP server (http://127.0.0.1) to view this page.');
+        }
+    </script>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-headphones-alt"></i>
+                </div>
+                <h1>Edygrim DJ</h1>
+                <p>Admin Dashboard Login</p>
+            </div>
+
+            <div id="error-message" class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-text"></span>
+            </div>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" required placeholder="admin@edygrim.com" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" required placeholder="Enter your password"
+                            autocomplete="current-password">
+                        <button type="button" class="password-toggle" id="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="submit-btn">
+                    <span id="button-text">Sign In</span>
+                </button>
+            </form>
+
+            <div class="back-link">
+                <a href="../index.html">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Main Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Configuration
+        const SUPABASE_URL = 'https://ptoxjmirnqtjdwdzolnt.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TQzqZImbJ6u1c858SKFI9Q_lyoeM5wF';
+
+        // Initialize Supabase with specific storage key
+        const supabaseLoginClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+                storageKey: 'edygrim-admin-auth' // Force consistent key
+            }
+        });
+
+        // DOM Elements
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const submitBtn = document.getElementById('submit-btn');
+        const buttonText = document.getElementById('button-text');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+
+        // Check if user is already logged in
+        async function checkExistingSession() {
+            try {
+                const { data: { session } } = await supabaseLoginClient.auth.getSession();
+                if (session) {
+                    console.log('User already logged in, redirecting...');
+                    window.location.href = 'admin-dashboard.html';
+                }
+            } catch (error) {
+                console.error('Session check error:', error);
+            }
+        }
+
+        // Toggle password visibility
+        togglePasswordBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Show error message
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            emailInput.classList.add('error');
+            passwordInput.classList.add('error');
+
+            // Auto-hide error after 5 seconds
+            setTimeout(() => {
+                hideError();
+            }, 5000);
+        }
+
+        // Hide error message
+        function hideError() {
+            errorMessage.style.display = 'none';
+            emailInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+        }
+
+        // Show loading state
+        function showLoading() {
+            submitBtn.disabled = true;
+            buttonText.innerHTML = '<div class="loading"></div> Signing in...';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            submitBtn.disabled = false;
+            buttonText.textContent = 'Sign In';
+        }
+
+        // Handle form submission
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            hideError();
+            showLoading();
+
+            try {
+                console.log('Attempting login for:', email);
+
+                const { data, error } = await supabaseLoginClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    console.error('Login error:', error);
+                    throw error;
+                }
+
+                console.log('Login successful:', data.user.email);
+
+                // Show success feedback
+                buttonText.innerHTML = '<i class="fas fa-check"></i> Success!';
+                submitBtn.style.background = '#28a745';
+
+                // Redirect after short delay
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login failed:', error);
+
+                // User-friendly error messages
+                let errorMsg = 'Login failed. Please check your credentials.';
+
+                if (error.message.includes('Invalid login credentials')) {
+                    errorMsg = 'Invalid email or password. Please try again.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    errorMsg = 'Please confirm your email before logging in.';
+                } else if (error.message.includes('Network')) {
+                    errorMsg = 'Network error. Please check your connection.';
+                }
+
+                showError(errorMsg);
+                hideLoading();
+            }
+        });
+
+        // Email validation helper
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Auto-focus email field on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            emailInput.focus();
+            checkExistingSession();
+
+            // Clear any stored errors on input
+            emailInput.addEventListener('input', hideError);
+            passwordInput.addEventListener('input', hideError);
+
+            // Allow login with Enter key in password field
+            passwordInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !submitBtn.disabled) {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+
+        // Add some helpful console info
+        console.log('Admin login page loaded');
+        console.log('Supabase URL:', SUPABASE_URL);
+    </script>
+</body>
+
+</html>

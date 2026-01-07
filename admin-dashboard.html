@@ -1,0 +1,1162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Admin Dashboard | Edygrim DJ</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-container { min-height: 100vh; background: #3b5b8a; }
+        .dashboard-header { background: rgba(173, 99, 99, 0.582); padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .dashboard-header h1 { margin: 0; color: #333; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .logout-btn { background: #dc3545; color: rgb(97, 30, 30); border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+        .logout-btn:hover { background: #c82333; }
+        .dashboard-content { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: rgb(83, 41, 41); padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #666; margin-bottom: 0.5rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-number { font-size: 2.5rem; font-weight: bold; color: #667eea; margin: 0; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid #e1e1e1; padding-bottom: 0.5rem; }
+        .tab-btn { padding: 0.75rem 1.5rem; background: none; border: none; border-radius: 5px 5px 0 0; cursor: pointer; font-weight: 600; color: #666; transition: all 0.3s ease; }
+        .tab-btn:hover { background: #f0f0f0; }
+        .tab-btn.active { background: #667eea; color: rgb(120, 60, 60); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .data-table { width: 100%; background: rgb(58, 76, 134); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: #f8f9fa; padding: 1rem; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #e1e1e1; }
+        .data-table td { padding: 1rem; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .data-table tr:hover { background: #f8f9fa; }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .action-btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem; transition: all 0.2s ease; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-view { background: #6c757d; color: white; }
+        .btn-confirm { background: #28a745; color: white; }
+        .btn-cancel { background: #dc3545; color: white; }
+        .btn-delete { background: #343a40; color: white; }
+        .loading { text-align: center; padding: 2rem; color: #666; }
+        .no-data { text-align: center; padding: 2rem; color: #666; font-style: italic; }
+        .search-filter { margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; }
+        .search-filter input { padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 4px; flex-grow: 1; }
+        .search-filter select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        @media (max-width: 768px) {
+            .dashboard-content { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .data-table { overflow-x: auto; }
+            .data-table table { min-width: 800px; }
+            .action-buttons { flex-direction: column; gap: 0.3rem; }
+            .action-btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('⚠️ IMPORTANT:\n\nYou are opening this file directly (file://).\nAuthentication persistence will NOT work.\n\nPlease use "Live Server" or a local HTTP server to view this page.');
+        }
+    </script>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Edygrim DJ Admin Dashboard</h1>
+            <div class="user-info">
+                <span id="user-email"></span>
+                <button onclick="signOut()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Bookings</h3>
+                    <p class="stat-number" id="total-bookings">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Bookings</h3>
+                    <p class="stat-number" id="pending-bookings">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Confirmed Bookings</h3>
+                    <p class="stat-number" id="confirmed-bookings">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Messages</h3>
+                    <p class="stat-number" id="total-messages">0</p>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('bookings')">
+                    <i class="fas fa-calendar-check"></i> Booking Requests
+                </button>
+                <button class="tab-btn" onclick="switchTab('messages')">
+                    <i class="fas fa-envelope"></i> Contact Messages
+                </button>
+                <button class="tab-btn" onclick="switchTab('gigs')">
+                    <i class="fas fa-music"></i> Manage Gigs
+                </button>
+            </div>
+            
+            <!-- Bookings Tab -->
+            <div id="bookings-tab" class="tab-content active">
+                <div class="search-filter">
+                    <input type="text" id="search-bookings" placeholder="Search bookings..." onkeyup="filterBookings()">
+                    <select id="status-filter" onchange="filterBookings()">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button onclick="refreshDashboard()" class="action-btn btn-view">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Event Type</th>
+                                <th>Date</th>
+                                <th>Venue</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            <tr>
+                                <td colspan="7" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading bookings...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Messages Tab -->
+            <div id="messages-tab" class="tab-content">
+                <div class="search-filter">
+                    <input type="text" id="search-messages" placeholder="Search messages..." onkeyup="filterMessages()">
+                    <button onclick="loadMessages()" class="action-btn btn-view">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading messages...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Gigs Tab -->
+            <div id="gigs-tab" class="tab-content">
+                <div style="background: white; padding: 2rem; border-radius: 10px;">
+                    <h3>Manage Upcoming Gigs</h3>
+                    <p>This feature will allow you to add, edit, and delete upcoming gigs.</p>
+                    <p><em>Coming soon with Supabase gigs table integration</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://ptoxjmirnqtjdwdzolnt.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TQzqZImbJ6u1c858SKFI9Q_lyoeM5wF';
+        
+        // Initialize Supabase with SAME storage key as login
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+                storageKey: 'edygrim-admin-auth'
+            }
+        });
+
+        // Global State
+        let allBookings = [];
+        let allMessages = [];
+        let statsRefreshInterval;
+
+        // STRICT Authentication Check
+        async function checkAuthAndRedirect() {
+            console.log('🔐 Checking authentication...');
+            
+            try {
+                // Get session with timeout
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error('Session error:', error);
+                    await forceLogout();
+                    return;
+                }
+                
+                console.log('Session exists:', !!session);
+                
+                if (!session) {
+                    console.log('❌ No active session - redirecting to login');
+                    await forceLogout();
+                } else {
+                    console.log('✅ Authenticated user:', session.user.email);
+                    document.getElementById('user-email').textContent = session.user.email;
+                    
+                    // Load initial data
+                    await loadInitialData();
+                    
+                    // Start auto-refresh
+                    startAutoRefresh();
+                }
+                
+            } catch (error) {
+                console.error('Auth check error:', error);
+                await forceLogout();
+            }
+        }
+
+        // Force logout and redirect
+        async function forceLogout() {
+            console.log('🔓 Forcing logout...');
+            try {
+                await supabaseClient.auth.signOut();
+            } catch (e) {
+                console.log('Signout error (ignored):', e);
+            }
+            
+            // Clear all auth storage
+            localStorage.removeItem('edygrim-admin-auth');
+            sessionStorage.clear();
+            
+            // Redirect to login
+            window.location.href = 'admin-login.html';
+        }
+
+        async function signOut() {
+            if (confirm('Are you sure you want to logout?')) {
+                stopAutoRefresh();
+                await forceLogout();
+            }
+        }
+
+        // Load all data
+        async function loadInitialData() {
+            try {
+                await Promise.all([loadBookings(), loadMessages()]);
+                await updateStats();
+                console.log('✅ All data loaded successfully');
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh() {
+            if (statsRefreshInterval) {
+                clearInterval(statsRefreshInterval);
+            }
+            
+            statsRefreshInterval = setInterval(async () => {
+                console.log('🔄 Auto-refreshing...');
+                await updateStats();
+            }, 30000); // 30 seconds
+            
+            console.log('✅ Auto-refresh started (every 30 seconds)');
+        }
+
+        // Stop auto-refresh
+        function stopAutoRefresh() {
+            if (statsRefreshInterval) {
+                clearInterval(statsRefreshInterval);
+                console.log('⏹️ Auto-refresh stopped');
+            }
+        }
+
+        // COMPLETE dashboard refresh
+        async function refreshDashboard() {
+            console.log('🔃 Manual refresh requested');
+            const refreshBtn = document.querySelector('.action-btn.btn-view i.fa-sync-alt');
+            
+            if (refreshBtn) {
+                refreshBtn.classList.add('fa-spin');
+            }
+            
+            try {
+                await Promise.all([
+                    loadBookings(),
+                    loadMessages(),
+                    updateStats()
+                ]);
+                console.log('✅ Dashboard fully refreshed');
+            } catch (error) {
+                console.error('Refresh error:', error);
+            } finally {
+                if (refreshBtn) {
+                    setTimeout(() => {
+                        refreshBtn.classList.remove('fa-spin');
+                    }, 1000);
+                }
+            }
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active to clicked tab
+            event.target.classList.add('active');
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Only load data if needed
+            if (tabName === 'messages' && allMessages.length === 0) {
+                loadMessages();
+            }
+        }
+
+        // Load bookings
+        async function loadBookings() {
+            const tableBody = document.getElementById('bookings-table-body');
+            if (!tableBody) {
+                console.error('❌ Bookings table body not found!');
+                return;
+            }
+            
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading bookings...
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                const { data: bookings, error } = await supabaseClient
+                    .from('booking_requests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Bookings query error:', error);
+                    throw error;
+                }
+                
+                allBookings = bookings || [];
+                console.log(`📊 Loaded ${allBookings.length} bookings`);
+                displayBookings(allBookings);
+                
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="color: #721c24; background: #f8d7da; padding: 2rem; text-align: center;">
+                            <i class="fas fa-exclamation-circle"></i><br>
+                            Error loading bookings:<br>
+                            ${escapeHtml(error.message)}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Display bookings
+        function displayBookings(bookings) {
+            const tableBody = document.getElementById('bookings-table-body');
+            if (!tableBody) return;
+            
+            if (!bookings || bookings.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            No booking requests yet
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${escapeHtml(booking.name || '')}</td>
+                    <td>${escapeHtml(booking.email || '')}</td>
+                    <td>${escapeHtml(booking.event_type || 'N/A')}</td>
+                    <td>${booking.event_date ? new Date(booking.event_date).toLocaleDateString() : 'N/A'}</td>
+                    <td>${escapeHtml(booking.venue || 'N/A')}</td>
+                    <td><span class="status-badge status-${booking.status || 'pending'}">${(booking.status || 'pending').toUpperCase()}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-view" onclick="viewBooking('${booking.id}')"><i class="fas fa-eye"></i> View</button>
+                            <button class="action-btn btn-confirm" onclick="updateBookingStatus('${booking.id}', 'confirmed')"><i class="fas fa-check"></i> Confirm</button>
+                            <button class="action-btn btn-cancel" onclick="updateBookingStatus('${booking.id}', 'cancelled')"><i class="fas fa-times"></i> Cancel</button>
+                            <button class="action-btn btn-delete" onclick="deleteBooking('${booking.id}')"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Filter bookings
+        function filterBookings() {
+            const searchTerm = document.getElementById('search-bookings').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            
+            const filtered = allBookings.filter(booking => {
+                const matchesSearch = !searchTerm || 
+                    (booking.name && booking.name.toLowerCase().includes(searchTerm)) ||
+                    (booking.email && booking.email.toLowerCase().includes(searchTerm)) ||
+                    (booking.venue && booking.venue.toLowerCase().includes(searchTerm)) ||
+                    (booking.event_type && booking.event_type.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || booking.status === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+            
+            displayBookings(filtered);
+        }
+
+        // Load messages
+        async function loadMessages() {
+            const tableBody = document.getElementById('messages-table-body');
+            
+            // Check if messages tab exists
+            if (!tableBody) {
+                console.log('📭 Messages tab not available, skipping messages load');
+                return;
+            }
+            
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading messages...
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                const { data: messages, error } = await supabaseClient
+                    .from('contact_messages')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allMessages = messages || [];
+                console.log(`📧 Loaded ${allMessages.length} messages`);
+                displayMessages(allMessages);
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="color: #721c24; background: #f8d7da; padding: 2rem; text-align: center;">
+                                <i class="fas fa-exclamation-circle"></i><br>
+                                Error loading messages:<br>
+                                ${escapeHtml(error.message)}
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+
+        // Display messages
+        function displayMessages(messages) {
+            const tableBody = document.getElementById('messages-table-body');
+            if (!tableBody) return;
+            
+            if (!messages || messages.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="no-data">
+                            No messages yet
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            
+            messages.forEach(message => {
+                const shortMessage = message.message && message.message.length > 100 
+                    ? escapeHtml(message.message.substring(0, 100)) + '...' 
+                    : escapeHtml(message.message || '');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${escapeHtml(message.name || '')}</td>
+                    <td>${escapeHtml(message.email || '')}</td>
+                    <td>${escapeHtml(message.subject || 'No subject')}</td>
+                    <td>${shortMessage}</td>
+                    <td>${message.created_at ? new Date(message.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-view" onclick="viewMessage('${message.id}')"><i class="fas fa-eye"></i> View</button>
+                            <button class="action-btn btn-delete" onclick="deleteMessage('${message.id}')"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Filter messages
+        function filterMessages() {
+            const searchTerm = document.getElementById('search-messages').value.toLowerCase();
+            const filtered = allMessages.filter(message => {
+                return !searchTerm || 
+                    (message.name && message.name.toLowerCase().includes(searchTerm)) ||
+                    (message.email && message.email.toLowerCase().includes(searchTerm)) ||
+                    (message.subject && message.subject.toLowerCase().includes(searchTerm)) ||
+                    (message.message && message.message.toLowerCase().includes(searchTerm));
+            });
+            displayMessages(filtered);
+        }
+
+        // Update booking status
+        async function updateBookingStatus(bookingId, status) {
+            if (!confirm(`Mark this booking as ${status}?`)) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('booking_requests')
+                    .update({ status: status })
+                    .eq('id', bookingId);
+                
+                if (error) throw error;
+                
+                alert('✅ Booking status updated!');
+                await refreshDashboard();
+                
+            } catch (error) {
+                console.error('Error updating booking:', error);
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // Delete booking
+        async function deleteBooking(bookingId) {
+            if (!confirm('⚠️ Delete this booking?\n\nThis cannot be undone!')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('booking_requests')
+                    .delete()
+                    .eq('id', bookingId);
+                
+                if (error) throw error;
+                
+                alert('✅ Booking deleted!');
+                await refreshDashboard();
+                
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                alert('❌ Delete failed: ' + error.message);
+            }
+        }
+
+        // Delete message
+        async function deleteMessage(messageId) {
+            if (!confirm('⚠️ Delete this message?\n\nThis cannot be undone!')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('contact_messages')
+                    .delete()
+                    .eq('id', messageId);
+                
+                if (error) throw error;
+                
+                alert('✅ Message deleted!');
+                await refreshDashboard();
+                
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('❌ Delete failed: ' + error.message);
+            }
+        }
+
+        // View booking details
+        async function viewBooking(bookingId) {
+            try {
+                const { data: booking, error } = await supabaseClient
+                    .from('booking_requests')
+                    .select('*')
+                    .eq('id', bookingId)
+                    .single();
+                
+                if (error) throw error;
+                
+                alert(`📋 BOOKING DETAILS\n───────────────────\n👤 Name: ${booking.name}\n📧 Email: ${booking.email}\n📞 Contact: ${booking.phone || 'Not provided'}\n🎪 Event: ${booking.event_type || 'N/A'}\n📅 Date: ${booking.event_date || 'N/A'}\n📍 Venue: ${booking.venue || 'N/A'}\n💰 Budget: ${booking.budget_range || 'N/A'}\n📝 Details: ${booking.details || 'None'}\n📊 Status: ${booking.status || 'pending'}\n🕒 Submitted: ${booking.created_at ? new Date(booking.created_at).toLocaleString() : 'N/A'}\n───────────────────`);
+                
+            } catch (error) {
+                console.error('Error viewing booking:', error);
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // View message details
+        async function viewMessage(messageId) {
+            try {
+                const { data: message, error } = await supabaseClient
+                    .from('contact_messages')
+                    .select('*')
+                    .eq('id', messageId)
+                    .single();
+                
+                if (error) throw error;
+                
+                alert(`📧 MESSAGE DETAILS\n───────────────────\n👤 Name: ${message.name}\n📧 Email: ${message.email}\n📋 Subject: ${message.subject || 'No subject'}\n🕒 Received: ${message.created_at ? new Date(message.created_at).toLocaleString() : 'N/A'}\n───────────────────\n📝 Message:\n${message.message || 'No content'}\n───────────────────`);
+                
+            } catch (error) {
+                console.error('Error viewing message:', error);
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // Stats Functions
+        async function updateStats() {
+            try {
+                console.log('📊 Updating stats...');
+                
+                // Get counts from Supabase
+                const [
+                    { count: totalBookings },
+                    { count: pendingBookings },
+                    { count: confirmedBookings },
+                    { count: totalMessages }
+                ] = await Promise.all([
+                    supabaseClient.from('booking_requests').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('booking_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                    supabaseClient.from('booking_requests').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
+                    supabaseClient.from('contact_messages').select('*', { count: 'exact', head: true })
+                ]);
+                
+                // Update DOM
+                document.getElementById('total-bookings').textContent = totalBookings || 0;
+                document.getElementById('pending-bookings').textContent = pendingBookings || 0;
+                document.getElementById('confirmed-bookings').textContent = confirmedBookings || 0;
+                document.getElementById('total-messages').textContent = totalMessages || 0;
+                
+                console.log('✅ Stats updated:', { totalBookings, pendingBookings, confirmedBookings, totalMessages });
+                
+            } catch (error) {
+                console.error('Error updating stats:', error);
+                // Fallback to local counts
+                document.getElementById('total-bookings').textContent = allBookings.length;
+                document.getElementById('pending-bookings').textContent = allBookings.filter(b => b.status === 'pending').length;
+                document.getElementById('confirmed-bookings').textContent = allBookings.filter(b => b.status === 'confirmed').length;
+                document.getElementById('total-messages').textContent = allMessages.length;
+            }
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
+        
+        // Debug helpers
+        window.debug = {
+            bookings: () => allBookings,
+            messages: () => allMessages,
+            refresh: refreshDashboard,
+            session: () => supabaseClient.auth.getSession()
+        };
+
+        // Global gig variables
+let allGigs = [];
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let isCalendarView = false;
+
+// Load gigs from Supabase
+async function loadGigs() {
+    const tableBody = document.getElementById('gigs-table-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="7" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading gigs...
+            </td>
+        </tr>
+    `;
+    
+    try {
+        const { data: gigs, error } = await supabaseClient
+            .from('gigs')
+            .select('*')
+            .order('date', { ascending: true });
+        
+        if (error) throw error;
+        
+        allGigs = gigs || [];
+        console.log(`🎵 Loaded ${allGigs.length} gigs`);
+        
+        if (isCalendarView) {
+            renderCalendar();
+        } else {
+            displayGigs(allGigs);
+        }
+        
+    } catch (error) {
+        console.error('Error loading gigs:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="color: #721c24; background: #f8d7da; padding: 2rem; text-align: center;">
+                    <i class="fas fa-exclamation-circle"></i><br>
+                    Error loading gigs:<br>
+                    ${escapeHtml(error.message)}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Display gigs in table
+function displayGigs(gigs) {
+    const tableBody = document.getElementById('gigs-table-body');
+    if (!tableBody) return;
+    
+    if (!gigs || gigs.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="no-data">
+                    No gigs scheduled yet. Click "Add New Gig" to create one.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tableBody.innerHTML = '';
+    
+    gigs.forEach(gig => {
+        const row = document.createElement('tr');
+        const formattedDate = gig.date ? new Date(gig.date).toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        }) : 'N/A';
+        
+        const timeRange = gig.start_time && gig.end_time 
+            ? `${formatTime(gig.start_time)} - ${formatTime(gig.end_time)}`
+            : gig.start_time 
+                ? formatTime(gig.start_time)
+                : 'TBD';
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(gig.title || 'Untitled Gig')}</strong></td>
+            <td>${formattedDate}</td>
+            <td>${timeRange}</td>
+            <td>${escapeHtml(gig.venue || 'N/A')}</td>
+            <td><span class="status-badge status-${gig.status || 'upcoming'}">${(gig.status || 'upcoming').toUpperCase()}</span></td>
+            <td>${gig.price ? `$${parseFloat(gig.price).toFixed(2)}` : 'N/A'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn btn-view" onclick="viewGig('${gig.id}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="action-btn btn-confirm" onclick="editGig('${gig.id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deleteGig('${gig.id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// Filter gigs
+function filterGigs() {
+    const searchTerm = document.getElementById('search-gigs').value.toLowerCase();
+    const statusFilter = document.getElementById('status-filter-gigs').value;
+    
+    const filtered = allGigs.filter(gig => {
+        const matchesSearch = !searchTerm || 
+            (gig.title && gig.title.toLowerCase().includes(searchTerm)) ||
+            (gig.venue && gig.venue.toLowerCase().includes(searchTerm)) ||
+            (gig.description && gig.description.toLowerCase().includes(searchTerm));
+        
+        const matchesStatus = !statusFilter || gig.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+    });
+    
+    displayGigs(filtered);
+}
+
+// Open add gig modal
+function openAddGigModal(gigId = null) {
+    const modal = document.getElementById('gig-modal');
+    const title = document.getElementById('modal-title');
+    const form = document.getElementById('gig-form');
+    
+    if (gigId) {
+        title.textContent = 'Edit Gig';
+        loadGigData(gigId);
+    } else {
+        title.textContent = 'Add New Gig';
+        form.reset();
+        document.getElementById('gig-id').value = '';
+        document.getElementById('gig-date').valueAsDate = new Date();
+        document.getElementById('gig-status').value = 'upcoming';
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Close gig modal
+function closeGigModal() {
+    document.getElementById('gig-modal').style.display = 'none';
+    document.getElementById('gig-form').reset();
+}
+
+// Load gig data for editing
+async function loadGigData(gigId) {
+    try {
+        const { data: gig, error } = await supabaseClient
+            .from('gigs')
+            .select('*')
+            .eq('id', gigId)
+            .single();
+        
+        if (error) throw error;
+        
+        document.getElementById('gig-id').value = gig.id;
+        document.getElementById('gig-title').value = gig.title || '';
+        document.getElementById('gig-description').value = gig.description || '';
+        document.getElementById('gig-date').value = gig.date || '';
+        document.getElementById('gig-start-time').value = gig.start_time || '';
+        document.getElementById('gig-end-time').value = gig.end_time || '';
+        document.getElementById('gig-venue').value = gig.venue || '';
+        document.getElementById('gig-price').value = gig.price || '';
+        document.getElementById('gig-status').value = gig.status || 'upcoming';
+        
+    } catch (error) {
+        console.error('Error loading gig data:', error);
+        alert('Error loading gig: ' + error.message);
+    }
+}
+
+// Handle gig form submission
+document.getElementById('gig-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const gigId = document.getElementById('gig-id').value;
+    const gigData = {
+        title: document.getElementById('gig-title').value.trim(),
+        description: document.getElementById('gig-description').value.trim(),
+        date: document.getElementById('gig-date').value,
+        start_time: document.getElementById('gig-start-time').value || null,
+        end_time: document.getElementById('gig-end-time').value || null,
+        venue: document.getElementById('gig-venue').value.trim(),
+        price: document.getElementById('gig-price').value || null,
+        status: document.getElementById('gig-status').value
+    };
+    
+    // Validation
+    if (!gigData.title || !gigData.date || !gigData.venue) {
+        alert('Please fill in all required fields (Title, Date, Venue)');
+        return;
+    }
+    
+    try {
+        let result;
+        
+        if (gigId) {
+            // Update existing gig
+            const { data, error } = await supabaseClient
+                .from('gigs')
+                .update(gigData)
+                .eq('id', gigId)
+                .select();
+            
+            if (error) throw error;
+            result = data;
+            console.log('✅ Gig updated:', gigId);
+        } else {
+            // Create new gig
+            const { data, error } = await supabaseClient
+                .from('gigs')
+                .insert([gigData])
+                .select();
+            
+            if (error) throw error;
+            result = data;
+            console.log('✅ Gig created:', result[0].id);
+        }
+        
+        closeGigModal();
+        await loadGigs();
+        alert(gigId ? 'Gig updated successfully!' : 'Gig created successfully!');
+        
+    } catch (error) {
+        console.error('Error saving gig:', error);
+        alert('Error saving gig: ' + error.message);
+    }
+});
+
+// Edit gig
+function editGig(gigId) {
+    openAddGigModal(gigId);
+}
+
+// View gig details
+async function viewGig(gigId) {
+    try {
+        const { data: gig, error } = await supabaseClient
+            .from('gigs')
+            .select('*')
+            .eq('id', gigId)
+            .single();
+        
+        if (error) throw error;
+        
+        const details = `🎵 GIG DETAILS
+───────────────────
+📌 Title: ${gig.title}
+📅 Date: ${gig.date ? new Date(gig.date).toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+}) : 'N/A'}
+🕒 Time: ${gig.start_time && gig.end_time 
+    ? `${formatTime(gig.start_time)} - ${formatTime(gig.end_time)}`
+    : gig.start_time 
+        ? formatTime(gig.start_time)
+        : 'TBD'}
+📍 Venue: ${gig.venue}
+💰 Price: ${gig.price ? `$${parseFloat(gig.price).toFixed(2)}` : 'Not specified'}
+📝 Status: ${gig.status || 'upcoming'}
+───────────────────
+📋 Description:
+${gig.description || 'No description provided.'}
+───────────────────`;
+        
+        alert(details);
+        
+    } catch (error) {
+        console.error('Error viewing gig:', error);
+        alert('❌ Error: ' + error.message);
+    }
+}
+
+// Delete gig
+async function deleteGig(gigId) {
+    if (!confirm('⚠️ Delete this gig?\n\nThis action cannot be undone!')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('gigs')
+            .delete()
+            .eq('id', gigId);
+        
+        if (error) throw error;
+        
+        alert('✅ Gig deleted successfully!');
+        await loadGigs();
+        
+    } catch (error) {
+        console.error('Error deleting gig:', error);
+        alert('❌ Delete failed: ' + error.message);
+    }
+}
+
+// Toggle between table and calendar view
+function toggleCalendarView() {
+    isCalendarView = !isCalendarView;
+    const container = document.getElementById('calendar-container');
+    const button = document.querySelector('button[onclick="toggleCalendarView()"]');
+    
+    if (isCalendarView) {
+        container.style.display = 'block';
+        button.innerHTML = '<i class="fas fa-table"></i> Switch to Table View';
+        renderCalendar();
+    } else {
+        container.style.display = 'none';
+        button.innerHTML = '<i class="fas fa-calendar-alt"></i> Switch to Calendar View';
+        displayGigs(allGigs);
+    }
+}
+
+// Calendar rendering
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendar');
+    const monthYear = document.getElementById('current-month');
+    
+    // Update month/year display
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+    monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    
+    // Get first day of month and total days
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const totalDays = lastDay.getDate();
+    const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // Clear calendar
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    days.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+    });
+    
+    // Add empty cells for days before the first day of month
+    for (let i = 0; i < startingDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyDay);
+    }
+    
+    // Add days of month
+    const today = new Date();
+    const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+    
+    for (let day = 1; day <= totalDays; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        
+        // Check if today
+        if (isCurrentMonth && day === today.getDate()) {
+            dayCell.classList.add('today');
+        }
+        
+        // Add day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'calendar-day-number';
+        dayNumber.textContent = day;
+        dayCell.appendChild(dayNumber);
+        
+        // Add gigs for this day
+        const currentDate = new Date(currentYear, currentMonth, day);
+        const dateString = currentDate.toISOString().split('T')[0];
+        const dayGigs = allGigs.filter(gig => gig.date === dateString);
+        
+        dayGigs.forEach(gig => {
+            const gigElement = document.createElement('div');
+            gigElement.className = `calendar-gig ${gig.status || 'upcoming'}`;
+            gigElement.title = `${gig.title}\n${gig.venue}\n${gig.start_time ? formatTime(gig.start_time) : 'All day'}`;
+            gigElement.textContent = gig.title;
+            gigElement.onclick = () => viewGig(gig.id);
+            dayCell.appendChild(gigElement);
+        });
+        
+        calendarGrid.appendChild(dayCell);
+    }
+}
+
+// Navigate calendar months
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar();
+}
+
+// Format time from HH:MM:SS to HH:MM AM/PM
+function formatTime(timeString) {
+    if (!timeString) return '';
+    
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12;
+    
+    return `${formattedHour}:${minutes} ${ampm}`;
+}
+
+// Initialize gigs when dashboard loads
+async function loadInitialData() {
+    try {
+        await Promise.all([loadBookings(), loadMessages(), loadGigs()]);
+        await updateStats();
+        console.log('✅ All data loaded successfully');
+    } catch (error) {
+        console.error('Error loading initial data:', error);
+    }
+}
+
+
+    </script>
+</body>
+</html>

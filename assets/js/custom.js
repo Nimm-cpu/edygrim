@@ -1,25 +1,25 @@
 // Custom JavaScript for Edygrim Portfolio
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize the site
     initSite();
-    
+
     // Form Handling
     setupForms();
-    
+
     // Audio Player Controls
     setupAudioPlayers();
-    
+
     // Booking System
     setupBookingSystem();
-    
+
     // Background Image Management
     setupBackgrounds();
 });
 
 function initSite() {
     console.log('Edygrim Portfolio Site Initialized');
-    
+
     // Set current year in footer
     const yearSpan = document.createElement('span');
     yearSpan.textContent = new Date().getFullYear();
@@ -27,7 +27,7 @@ function initSite() {
     if (copyright) {
         copyright.innerHTML = copyright.innerHTML.replace('2024', yearSpan.textContent);
     }
-    
+
     // Add active navigation highlighting
     highlightActiveNav();
 }
@@ -35,17 +35,17 @@ function initSite() {
 function highlightActiveNav() {
     const navLinks = document.querySelectorAll('nav a');
     const articles = document.querySelectorAll('article');
-    
+
     function setActiveLink() {
         let currentArticle = '';
-        
+
         articles.forEach(article => {
             const rect = article.getBoundingClientRect();
             if (rect.top <= 100 && rect.bottom >= 100) {
                 currentArticle = article.id;
             }
         });
-        
+
         navLinks.forEach(link => {
             const href = link.getAttribute('href').replace('#', '');
             if (href === currentArticle) {
@@ -55,60 +55,21 @@ function highlightActiveNav() {
             }
         });
     }
-    
+
     window.addEventListener('scroll', setActiveLink);
     setActiveLink(); // Initial call
 }
 
 function setupForms() {
     // Booking Form Submission
+    // Booking Form Submission Handled by supabase-config.js
     const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = {
-                name: document.getElementById('book-name').value,
-                email: document.getElementById('book-email').value,
-                eventType: document.getElementById('book-event').value,
-                date: document.getElementById('book-date').value,
-                venue: document.getElementById('book-venue').value,
-                details: document.getElementById('book-details').value,
-                budget: document.getElementById('book-budget').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Save to localStorage for now (will be replaced with Supabase)
-            saveBooking(formData);
-            
-            // Show success message
-            showNotification('Booking request sent successfully! I\'ll contact you within 24 hours.', 'success');
-            
-            // Reset form
-            bookingForm.reset();
-        });
-    }
-    
+    // if (bookingForm) { ... } conflicting listener removed
+
     // Contact Form Submission
+    // Contact Form Submission Handled by supabase-config.js
     const contactForm = document.querySelector('article#contact form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('contact-name').value,
-                email: document.getElementById('contact-email').value,
-                subject: document.getElementById('contact-subject').value,
-                message: document.getElementById('contact-message').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            saveContact(formData);
-            showNotification('Message sent! I\'ll get back to you soon.', 'success');
-            contactForm.reset();
-        });
-    }
+    // if (contactForm) { ... } conflicting listener removed
 }
 
 function saveBooking(data) {
@@ -116,9 +77,9 @@ function saveBooking(data) {
     let bookings = JSON.parse(localStorage.getItem('edygrim_bookings')) || [];
     bookings.push(data);
     localStorage.setItem('edygrim_bookings', JSON.stringify(bookings));
-    
+
     console.log('Booking saved:', data);
-    
+
     // TODO: Replace with Supabase API call
     // supabase.from('bookings').insert([data])
 }
@@ -127,9 +88,9 @@ function saveContact(data) {
     let messages = JSON.parse(localStorage.getItem('edygrim_messages')) || [];
     messages.push(data);
     localStorage.setItem('edygrim_messages', JSON.stringify(messages));
-    
+
     console.log('Message saved:', data);
-    
+
     // TODO: Replace with Supabase API call
     // supabase.from('messages').insert([data])
 }
@@ -137,11 +98,11 @@ function saveContact(data) {
 function setupAudioPlayers() {
     // Custom audio player controls
     const audioPlayers = document.querySelectorAll('audio');
-    
+
     audioPlayers.forEach(player => {
         // Add custom play/pause functionality
         const container = player.parentElement;
-        
+
         // Create custom controls if needed
         const customControls = document.createElement('div');
         customControls.className = 'custom-audio-controls';
@@ -150,17 +111,17 @@ function setupAudioPlayers() {
             <button class="pause-btn"><i class="fas fa-pause"></i></button>
             <span class="time">00:00 / 00:00</span>
         `;
-        
+
         container.appendChild(customControls);
-        
+
         // Add event listeners for custom controls
         const playBtn = customControls.querySelector('.play-btn');
         const pauseBtn = customControls.querySelector('.pause-btn');
         const timeSpan = customControls.querySelector('.time');
-        
+
         playBtn.addEventListener('click', () => player.play());
         pauseBtn.addEventListener('click', () => player.pause());
-        
+
         player.addEventListener('timeupdate', () => {
             const currentTime = formatTime(player.currentTime);
             const duration = formatTime(player.duration);
@@ -182,15 +143,15 @@ function setupBookingSystem() {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
     }
-    
+
     // Setup budget range tooltips
     const budgetSelect = document.getElementById('book-budget');
     if (budgetSelect) {
-        budgetSelect.addEventListener('change', function() {
+        budgetSelect.addEventListener('change', function () {
             const value = this.value;
             let message = '';
-            
-            switch(value) {
+
+            switch (value) {
                 case '0-20000':
                     message = 'Small events, private parties';
                     break;
@@ -204,7 +165,7 @@ function setupBookingSystem() {
                     message = 'Premium events, multi-day festivals';
                     break;
             }
-            
+
             if (message) {
                 showNotification(message, 'info', 3000);
             }
@@ -223,13 +184,13 @@ function setupBackgrounds() {
         'about': 'assets/css/Ed4.jpg',
         'contact': 'assets/css/eddy3.jpg'
     };
-    
+
     // Preload images
     Object.values(bgImageUrls).forEach(url => {
         const img = new Image();
         img.src = url;
     });
-    
+
     // Update background based on active section
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -241,7 +202,7 @@ function setupBackgrounds() {
             }
         });
     }, { threshold: 0.5 });
-    
+
     sections.forEach(section => observer.observe(section));
 }
 
@@ -249,7 +210,7 @@ function showNotification(message, type = 'info', duration = 5000) {
     // Remove existing notifications
     const existing = document.querySelector('.notification');
     if (existing) existing.remove();
-    
+
     // Create notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -257,7 +218,7 @@ function showNotification(message, type = 'info', duration = 5000) {
         <span>${message}</span>
         <button class="close-notif">&times;</button>
     `;
-    
+
     // Style the notification
     notification.style.cssText = `
         position: fixed;
@@ -272,7 +233,7 @@ function showNotification(message, type = 'info', duration = 5000) {
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         animation: slideIn 0.3s ease;
     `;
-    
+
     // Add close button functionality
     const closeBtn = notification.querySelector('.close-notif');
     closeBtn.style.cssText = `
@@ -289,9 +250,9 @@ function showNotification(message, type = 'info', duration = 5000) {
         height: 20px;
         line-height: 20px;
     `;
-    
+
     closeBtn.addEventListener('click', () => notification.remove());
-    
+
     // Add animation
     const style = document.createElement('style');
     style.textContent = `
@@ -301,9 +262,9 @@ function showNotification(message, type = 'info', duration = 5000) {
         }
     `;
     document.head.appendChild(style);
-    
+
     document.body.appendChild(notification);
-    
+
     // Auto remove after duration
     if (duration > 0) {
         setTimeout(() => {
@@ -327,12 +288,12 @@ async function initSupabase() {
 const mixData = {
     currentMix: null,
     mixes: [],
-    
+
     async loadMixes() {
         // TODO: Load from Supabase
         // this.mixes = await supabase.from('mixes').select('*');
     },
-    
+
     async addMix(mix) {
         // TODO: Add to Supabase
         // await supabase.from('mixes').insert([mix]);
@@ -342,12 +303,12 @@ const mixData = {
 // Gig data management
 const gigData = {
     upcomingGigs: [],
-    
+
     async loadGigs() {
         // TODO: Load from Supabase
         // this.upcomingGigs = await supabase.from('gigs').select('*').gte('date', new Date().toISOString());
     },
-    
+
     async addGig(gig) {
         // TODO: Add to Supabase
         // await supabase.from('gigs').insert([gig]);
@@ -357,10 +318,10 @@ const gigData = {
 // Stats Counter Animation
 function animateStats() {
     const statItems = document.querySelectorAll('.stat-item');
-    
+
     statItems.forEach((item, index) => {
         item.style.setProperty('--item-index', index);
-        
+
         const number = item.querySelector('h3');
         if (number) {
             const target = parseInt(number.textContent);
@@ -374,7 +335,7 @@ function animateStats() {
 function animateCounter(element, target, duration) {
     let start = 0;
     const increment = target / (duration / 16); // 60fps
-    
+
     const timer = setInterval(() => {
         start += increment;
         if (start >= target) {
@@ -389,7 +350,7 @@ function animateCounter(element, target, duration) {
 // Mix Player Enhancements
 function enhanceAudioPlayers() {
     const audioPlayers = document.querySelectorAll('audio');
-    
+
     audioPlayers.forEach((player, index) => {
         // Add custom styling
         player.style.cssText = `
@@ -398,24 +359,24 @@ function enhanceAudioPlayers() {
             border-radius: 20px;
             outline: none;
         `;
-        
+
         // Custom controls
-        player.addEventListener('play', function() {
+        player.addEventListener('play', function () {
             this.parentElement.style.boxShadow = '0 0 15px rgba(255, 69, 0, 0.5)';
         });
-        
-        player.addEventListener('pause', function() {
+
+        player.addEventListener('pause', function () {
             this.parentElement.style.boxShadow = 'none';
         });
-        
-        player.addEventListener('ended', function() {
+
+        player.addEventListener('ended', function () {
             this.parentElement.style.boxShadow = 'none';
             showNotification(`Finished: ${this.closest('.mix-player').querySelector('h3').textContent}`, 'info', 3000);
         });
-        
+
         // Volume control
         player.volume = 0.7;
-        
+
         // Add download button
         const downloadBtn = document.createElement('a');
         downloadBtn.href = player.querySelector('source').src;
@@ -433,15 +394,15 @@ function enhanceAudioPlayers() {
             font-size: 0.9rem;
             transition: all 0.3s ease;
         `;
-        
-        downloadBtn.addEventListener('mouseenter', function() {
+
+        downloadBtn.addEventListener('mouseenter', function () {
             this.style.background = '#ff4500';
         });
-        
-        downloadBtn.addEventListener('mouseleave', function() {
+
+        downloadBtn.addEventListener('mouseleave', function () {
             this.style.background = '#333';
         });
-        
+
         player.parentElement.appendChild(downloadBtn);
     });
 }
@@ -449,12 +410,12 @@ function enhanceAudioPlayers() {
 // Gig Cards Interactive Features
 function setupGigCards() {
     const gigCards = document.querySelectorAll('.gig-card');
-    
+
     gigCards.forEach(card => {
         // Add click effect
         card.style.cursor = 'pointer';
-        
-        card.addEventListener('click', function(e) {
+
+        card.addEventListener('click', function (e) {
             if (!e.target.closest('a') && !e.target.closest('button')) {
                 this.style.transform = 'scale(0.99)';
                 setTimeout(() => {
@@ -462,17 +423,17 @@ function setupGigCards() {
                 }, 200);
             }
         });
-        
+
         // Add calendar integration for Rock Riot
         const title = card.querySelector('h3').textContent;
         if (title.includes('Rock Riot')) {
             addRockRiotDates(card);
         }
-        
+
         // Add notification button functionality
         const notifyBtn = card.querySelector('button');
         if (notifyBtn && notifyBtn.textContent.includes('Notify')) {
-            notifyBtn.addEventListener('click', function(e) {
+            notifyBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 setupGigNotification(card);
             });
@@ -483,23 +444,23 @@ function setupGigCards() {
 function addRockRiotDates(card) {
     // Calculate next Rock Riot dates (last Saturday of each month)
     const nextDates = getNextRockRiotDates(3); // Get next 3 dates
-    
+
     const datesHTML = `
         <div class="rock-riot-dates">
             <h4>Upcoming Dates:</h4>
             <ul>
                 ${nextDates.map(date => `
-                    <li>${date.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        month: 'long', 
-                        day: 'numeric',
-                        year: 'numeric'
-                    })}</li>
+                    <li>${date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    })}</li>
                 `).join('')}
             </ul>
         </div>
     `;
-    
+
     const datesElement = document.createElement('div');
     datesElement.innerHTML = datesHTML;
     datesElement.style.cssText = `
@@ -509,18 +470,18 @@ function addRockRiotDates(card) {
         border-radius: 6px;
         border: 1px solid rgba(255, 69, 0, 0.3);
     `;
-    
+
     datesElement.querySelector('h4').style.cssText = `
         color: #ff4500;
         margin-bottom: 0.5rem;
         font-size: 1rem;
     `;
-    
+
     datesElement.querySelector('ul').style.cssText = `
         list-style: none;
         padding-left: 0;
     `;
-    
+
     datesElement.querySelectorAll('li').forEach(li => {
         li.style.cssText = `
             color: #ccc;
@@ -528,41 +489,41 @@ function addRockRiotDates(card) {
             border-bottom: 1px solid rgba(255, 69, 0, 0.1);
         `;
     });
-    
+
     card.appendChild(datesElement);
 }
 
 function getNextRockRiotDates(count) {
     const dates = [];
     const today = new Date();
-    
+
     for (let i = 0; i < count; i++) {
         const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
-        
+
         // Find last Saturday of the month
         const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
         const lastSaturday = new Date(lastDay);
-        
+
         // Go back to find Saturday
         while (lastSaturday.getDay() !== 6) {
             lastSaturday.setDate(lastSaturday.getDate() - 1);
         }
-        
+
         // If date has passed, get next month
         if (lastSaturday <= today) {
             date.setMonth(date.getMonth() + 1);
             return getNextRockRiotDates(count); // Recursively get dates
         }
-        
+
         dates.push(lastSaturday);
     }
-    
+
     return dates;
 }
 
 function setupGigNotification(card) {
     const gigTitle = card.querySelector('h3').textContent;
-    
+
     // Create notification modal
     const modal = document.createElement('div');
     modal.className = 'notification-modal';
@@ -577,7 +538,7 @@ function setupGigNotification(card) {
             </div>
         </div>
     `;
-    
+
     modal.style.cssText = `
         position: fixed;
         top: 0;
@@ -590,7 +551,7 @@ function setupGigNotification(card) {
         align-items: center;
         z-index: 1000;
     `;
-    
+
     modal.querySelector('.modal-content').style.cssText = `
         background: #222;
         padding: 2rem;
@@ -599,17 +560,17 @@ function setupGigNotification(card) {
         max-width: 400px;
         width: 90%;
     `;
-    
+
     modal.querySelector('h3').style.cssText = `
         color: #ff4500;
         margin-bottom: 1rem;
     `;
-    
+
     modal.querySelector('p').style.cssText = `
         color: #ccc;
         margin-bottom: 1rem;
     `;
-    
+
     const emailInput = modal.querySelector('.notify-email');
     emailInput.style.cssText = `
         width: 100%;
@@ -621,14 +582,14 @@ function setupGigNotification(card) {
         border-radius: 4px;
         font-size: 1rem;
     `;
-    
+
     const buttons = modal.querySelector('.modal-buttons');
     buttons.style.cssText = `
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
     `;
-    
+
     const submitBtn = modal.querySelector('.submit-notify');
     submitBtn.style.cssText = `
         background: #ff4500;
@@ -639,7 +600,7 @@ function setupGigNotification(card) {
         cursor: pointer;
         font-weight: bold;
     `;
-    
+
     const cancelBtn = modal.querySelector('.cancel-notify');
     cancelBtn.style.cssText = `
         background: #444;
@@ -649,9 +610,9 @@ function setupGigNotification(card) {
         border-radius: 4px;
         cursor: pointer;
     `;
-    
+
     // Add event listeners
-    submitBtn.addEventListener('click', function() {
+    submitBtn.addEventListener('click', function () {
         const email = emailInput.value;
         if (validateEmail(email)) {
             saveGigNotification(email, gigTitle);
@@ -662,17 +623,17 @@ function setupGigNotification(card) {
             showNotification('Please enter a valid email address', 'error');
         }
     });
-    
-    cancelBtn.addEventListener('click', function() {
+
+    cancelBtn.addEventListener('click', function () {
         modal.remove();
     });
-    
-    modal.addEventListener('click', function(e) {
+
+    modal.addEventListener('click', function (e) {
         if (e.target === modal) {
             modal.remove();
         }
     });
-    
+
     document.body.appendChild(modal);
     emailInput.focus();
 }
@@ -690,7 +651,7 @@ function saveGigNotification(email, gigTitle) {
         date: new Date().toISOString()
     });
     localStorage.setItem('edygrim_gig_notifications', JSON.stringify(notifications));
-    
+
     // TODO: Send to Supabase when implemented
     // supabase.from('gig_notifications').insert([{ email, gig: gigTitle }])
 }
@@ -706,9 +667,9 @@ function initSectionFeatures() {
 }
 
 // Add to DOMContentLoaded event listener
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // ... existing initialization code ...
-    
+
     // Add section features initialization
     initSectionFeatures();
 });
@@ -748,22 +709,22 @@ document.head.appendChild(style);
 function setupBookingForm() {
     const bookingForm = document.getElementById('booking-form');
     if (!bookingForm) return;
-    
+
     // Add required indicators
     addRequiredIndicators();
-    
+
     // Setup date restrictions
     setupDateRestrictions();
-    
+
     // Setup budget range indicator
     setupBudgetIndicator();
-    
-    // Form submission handler
-    bookingForm.addEventListener('submit', handleBookingSubmit);
-    
+
+    // Form submission handler - REMOVED to avoid conflict with supabase-config.js
+    // bookingForm.addEventListener('submit', handleBookingSubmit);
+
     // Form validation
     setupFormValidation(bookingForm);
-    
+
     // Character counter for textarea
     setupCharacterCounter();
 }
@@ -776,7 +737,7 @@ function addRequiredIndicators() {
         'book-date',
         'book-venue'
     ];
-    
+
     requiredLabels.forEach(id => {
         const label = document.querySelector(`label[for="${id}"]`);
         if (label) {
@@ -788,23 +749,23 @@ function addRequiredIndicators() {
 function setupDateRestrictions() {
     const dateInput = document.getElementById('book-date');
     if (!dateInput) return;
-    
+
     // Set minimum date to today
     const today = new Date();
     const minDate = today.toISOString().split('T')[0];
     dateInput.min = minDate;
-    
+
     // Set maximum date to 1 year from now
     const maxDate = new Date(today);
     maxDate.setFullYear(maxDate.getFullYear() + 1);
     dateInput.max = maxDate.toISOString().split('T')[0];
-    
+
     // Add custom date validation
-    dateInput.addEventListener('change', function() {
+    dateInput.addEventListener('change', function () {
         const selectedDate = new Date(this.value);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         if (selectedDate < today) {
             showValidationError(this, 'Please select a future date');
         } else {
@@ -816,7 +777,7 @@ function setupDateRestrictions() {
 function setupBudgetIndicator() {
     const budgetSelect = document.getElementById('book-budget');
     if (!budgetSelect) return;
-    
+
     // Create budget indicator
     const indicatorHTML = `
         <div class="budget-indicator">
@@ -826,21 +787,21 @@ function setupBudgetIndicator() {
             <span class="budget-value">Select budget</span>
         </div>
     `;
-    
+
     const indicator = document.createElement('div');
     indicator.innerHTML = indicatorHTML;
     budgetSelect.parentNode.appendChild(indicator);
-    
+
     const budgetFill = indicator.querySelector('.budget-fill');
     const budgetValue = indicator.querySelector('.budget-value');
-    
+
     // Update indicator on change
-    budgetSelect.addEventListener('change', function() {
+    budgetSelect.addEventListener('change', function () {
         const value = this.value;
         let percentage = 0;
         let displayText = 'Select budget';
-        
-        switch(value) {
+
+        switch (value) {
             case '0-20000':
                 percentage = 25;
                 displayText = 'KES 0-20K';
@@ -858,14 +819,14 @@ function setupBudgetIndicator() {
                 displayText = 'KES 100K+';
                 break;
         }
-        
+
         budgetFill.style.width = `${percentage}%`;
         budgetValue.textContent = displayText;
-        
+
         // Show budget guidance
         showBudgetGuidance(value);
     });
-    
+
     // Initial state
     budgetFill.style.width = '0%';
 }
@@ -877,7 +838,7 @@ function showBudgetGuidance(budgetRange) {
         '50000-100000': 'Large events, festivals, corporate (4-6 hours)',
         '100000+': 'Premium events, multi-day festivals, weddings'
     };
-    
+
     if (messages[budgetRange]) {
         showNotification(messages[budgetRange], 'info', 4000);
     }
@@ -885,23 +846,23 @@ function showBudgetGuidance(budgetRange) {
 
 function setupFormValidation(form) {
     const inputs = form.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach(input => {
         // Real-time validation
-        input.addEventListener('blur', function() {
+        input.addEventListener('blur', function () {
             validateField(this);
         });
-        
+
         // Clear validation on input
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             clearValidationError(this);
         });
     });
-    
+
     // Email validation
     const emailInput = document.getElementById('book-email');
     if (emailInput) {
-        emailInput.addEventListener('change', function() {
+        emailInput.addEventListener('change', function () {
             if (!isValidEmail(this.value)) {
                 showValidationError(this, 'Please enter a valid email address');
             }
@@ -914,14 +875,14 @@ function validateField(field) {
         showValidationError(field, 'This field is required');
         return false;
     }
-    
+
     if (field.type === 'email' && field.value) {
         if (!isValidEmail(field.value)) {
             showValidationError(field, 'Please enter a valid email address');
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -932,7 +893,7 @@ function isValidEmail(email) {
 
 function showValidationError(field, message) {
     clearValidationError(field);
-    
+
     const error = document.createElement('div');
     error.className = 'validation-error';
     error.textContent = message;
@@ -945,7 +906,7 @@ function showValidationError(field, message) {
         border-radius: 4px;
         border-left: 2px solid #ff4444;
     `;
-    
+
     field.parentNode.appendChild(error);
     field.style.borderColor = '#ff4444';
 }
@@ -961,7 +922,7 @@ function clearValidationError(field) {
 function setupCharacterCounter() {
     const textarea = document.getElementById('book-details');
     if (!textarea) return;
-    
+
     const counter = document.createElement('div');
     counter.className = 'char-counter';
     counter.style.cssText = `
@@ -970,14 +931,14 @@ function setupCharacterCounter() {
         color: #888;
         margin-top: 0.3rem;
     `;
-    
+
     textarea.parentNode.appendChild(counter);
-    
+
     function updateCounter() {
         const length = textarea.value.length;
         const maxLength = textarea.getAttribute('maxlength') || 1000;
         counter.textContent = `${length}/${maxLength} characters`;
-        
+
         if (length > maxLength * 0.9) {
             counter.style.color = '#ff4500';
         } else if (length > maxLength * 0.7) {
@@ -986,89 +947,46 @@ function setupCharacterCounter() {
             counter.style.color = '#888';
         }
     }
-    
+
     textarea.addEventListener('input', updateCounter);
     updateCounter(); // Initial call
 }
 
-async function handleBookingSubmit(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = collectFormData(form);
-    
-    // Validate all fields
-    if (!validateForm(form)) {
-        showNotification('Please fill in all required fields correctly', 'error');
-        return;
-    }
-    
-    // Show loading state
-    setFormLoading(true);
-    
-    try {
-        // Save to localStorage (temporary until Supabase)
-        saveBookingToStorage(formData);
-        
-        // Generate booking ID
-        const bookingId = generateBookingId();
-        
-        // Show confirmation
-        showBookingConfirmation(bookingId, formData);
-        
-        // Send email notification (simulated)
-        await sendBookingNotification(formData, bookingId);
-        
-        // Reset form
-        form.reset();
-        
-        // Reset budget indicator
-        resetBudgetIndicator();
-        
-        // Show success message
-        showNotification('Booking request sent successfully! You will receive a confirmation soon.', 'success', 5000);
-        
-    } catch (error) {
-        console.error('Booking error:', error);
-        showNotification('There was an error submitting your booking. Please try again.', 'error');
-    } finally {
-        setFormLoading(false);
-    }
-}
+// function handleBookingSubmit(e) { ... } - REMOVED to avoid conflict
 
 function collectFormData(form) {
     const formData = {
         timestamp: new Date().toISOString(),
         status: 'pending'
     };
-    
+
     const inputs = form.querySelectorAll('input, select, textarea');
     inputs.forEach(input => {
         if (input.name) {
             formData[input.name] = input.value;
         }
     });
-    
+
     return formData;
 }
 
 function validateForm(form) {
     let isValid = true;
     const requiredFields = form.querySelectorAll('[required]');
-    
+
     requiredFields.forEach(field => {
         if (!validateField(field)) {
             isValid = false;
         }
     });
-    
+
     return isValid;
 }
 
 function setFormLoading(loading) {
     const form = document.getElementById('booking-form');
     const submitBtn = form.querySelector('input[type="submit"]');
-    
+
     if (loading) {
         form.classList.add('loading');
         submitBtn.value = 'Sending...';
@@ -1084,10 +1002,10 @@ function saveBookingToStorage(bookingData) {
     const bookings = JSON.parse(localStorage.getItem('edygrim_bookings')) || [];
     bookings.push(bookingData);
     localStorage.setItem('edygrim_bookings', JSON.stringify(bookings));
-    
+
     // Log for debugging
     console.log('Booking saved:', bookingData);
-    
+
     // TODO: Replace with Supabase integration
     // await supabase.from('bookings').insert([bookingData]);
 }
@@ -1101,20 +1019,20 @@ function generateBookingId() {
 function showBookingConfirmation(bookingId, formData) {
     // Create or show confirmation element
     let confirmation = document.querySelector('.booking-confirmation');
-    
+
     if (!confirmation) {
         confirmation = document.createElement('div');
         confirmation.className = 'booking-confirmation';
         document.getElementById('booking').appendChild(confirmation);
     }
-    
+
     const eventDate = new Date(formData['book-date']).toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
-    
+
     confirmation.innerHTML = `
         <h3>🎉 Booking Request Submitted!</h3>
         <p>Thank you <strong>${formData['book-name']}</strong> for your booking request.</p>
@@ -1122,12 +1040,12 @@ function showBookingConfirmation(bookingId, formData) {
         <div class="booking-id">Booking ID: ${bookingId}</div>
         <p><small>You'll receive a confirmation email shortly. You can also contact me directly on WhatsApp for urgent inquiries.</small></p>
     `;
-    
+
     confirmation.classList.add('show');
-    
+
     // Scroll to confirmation
     confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
+
     // Auto-hide after 30 seconds
     setTimeout(() => {
         confirmation.classList.remove('show');
@@ -1139,10 +1057,10 @@ async function sendBookingNotification(bookingData, bookingId) {
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log('Notification sent:', { bookingId, ...bookingData });
-            
+
             // TODO: Integrate with email service or Supabase edge functions
             // Example: SendGrid, AWS SES, or Supabase Edge Functions
-            
+
             resolve(true);
         }, 1000);
     });
@@ -1151,7 +1069,7 @@ async function sendBookingNotification(bookingData, bookingId) {
 function resetBudgetIndicator() {
     const budgetFill = document.querySelector('.budget-fill');
     const budgetValue = document.querySelector('.budget-value');
-    
+
     if (budgetFill && budgetValue) {
         budgetFill.style.width = '0%';
         budgetValue.textContent = 'Select budget';
@@ -1162,9 +1080,9 @@ function resetBudgetIndicator() {
 function setupWhatsAppBooking() {
     const whatsappBtn = document.querySelector('.whatsapp-btn');
     if (!whatsappBtn) return;
-    
+
     // Add click tracking
-    whatsappBtn.addEventListener('click', function() {
+    whatsappBtn.addEventListener('click', function () {
         // Track WhatsApp booking clicks
         const whatsappClicks = JSON.parse(localStorage.getItem('edygrim_whatsapp_clicks')) || [];
         whatsappClicks.push({
@@ -1172,14 +1090,14 @@ function setupWhatsAppBooking() {
             source: 'booking_section'
         });
         localStorage.setItem('edygrim_whatsapp_clicks', JSON.stringify(whatsappClicks));
-        
+
         // TODO: Send to analytics
     });
-    
+
     // Pre-fill WhatsApp message with form data if available
     const form = document.getElementById('booking-form');
     if (form) {
-        form.addEventListener('input', function() {
+        form.addEventListener('input', function () {
             updateWhatsAppMessage();
         });
     }
@@ -1189,15 +1107,15 @@ function updateWhatsAppMessage() {
     const nameInput = document.getElementById('book-name');
     const eventInput = document.getElementById('book-event');
     const dateInput = document.getElementById('book-date');
-    
+
     if (nameInput && nameInput.value) {
         const name = nameInput.value.split(' ')[0]; // First name only
         const eventType = eventInput ? eventInput.options[eventInput.selectedIndex].text : 'event';
         const date = dateInput ? new Date(dateInput.value).toLocaleDateString() : 'a date';
-        
+
         const message = `Hi Edygrim, I'm ${name}. I'd like to book you for a ${eventType} on ${date}.`;
         const encodedMessage = encodeURIComponent(message);
-        
+
         const whatsappBtn = document.querySelector('.whatsapp-btn');
         if (whatsappBtn) {
             whatsappBtn.href = `https://wa.me/254714937005?text=${encodedMessage}`;
@@ -1212,9 +1130,9 @@ function initBookingFeatures() {
 }
 
 // Add to DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // ... existing initialization code ...
-    
+
     // Initialize booking features
     initBookingFeatures();
 });
@@ -1251,41 +1169,41 @@ document.head.appendChild(bookingStyles);
 function setupAboutSection() {
     // Animate list items
     animateListItems();
-    
+
     // Setup interactive tags
     setupMusicTags();
-    
+
     // Setup parallax effect for the image
     setupParallaxImage();
-    
+
     // Setup timeline (if added later)
     setupTimeline();
-    
+
     // Setup stats counter
     setupAboutStats();
-    
+
     // Setup testimonial slider (if added later)
     setupTestimonialSlider();
 }
 
 function animateListItems() {
     const listItems = document.querySelectorAll('#about ul li');
-    
+
     listItems.forEach((item, index) => {
         item.style.setProperty('--item-index', index);
-        
+
         // Add hover sound effect
-        item.addEventListener('mouseenter', function() {
+        item.addEventListener('mouseenter', function () {
             playRockSound('hover');
         });
-        
+
         // Add click to copy feature
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const text = this.textContent.replace('✓', '').trim();
             copyToClipboard(text);
             showNotification(`Copied: "${text}"`, 'info', 2000);
         });
-        
+
         // Add tooltip
         item.title = 'Click to copy';
     });
@@ -1295,42 +1213,42 @@ function setupMusicTags() {
     const tags = document.querySelectorAll('.tag');
     const rockSounds = [
         'guitar_riff_1',
-        'guitar_riff_2', 
+        'guitar_riff_2',
         'drum_fill_1',
         'bass_slide'
     ];
-    
+
     tags.forEach(tag => {
         // Add click event to play sound
-        tag.addEventListener('click', function(e) {
+        tag.addEventListener('click', function (e) {
             e.stopPropagation();
             const randomSound = rockSounds[Math.floor(Math.random() * rockSounds.length)];
             playRockSound(randomSound);
-            
+
             // Visual feedback
             this.style.animation = 'none';
             setTimeout(() => {
                 this.style.animation = '';
             }, 10);
-            
+
             // Show genre info
             showTagInfo(this.textContent);
         });
-        
+
         // Add hover effect with delay
         let hoverTimeout;
-        tag.addEventListener('mouseenter', function() {
+        tag.addEventListener('mouseenter', function () {
             hoverTimeout = setTimeout(() => {
                 this.classList.add('active');
             }, 300);
         });
-        
-        tag.addEventListener('mouseleave', function() {
+
+        tag.addEventListener('mouseleave', function () {
             clearTimeout(hoverTimeout);
             this.classList.remove('active');
         });
     });
-    
+
     // Create genre info modal
     createGenreInfoModal();
 }
@@ -1339,7 +1257,7 @@ function playRockSound(soundType) {
     // This is a placeholder for actual sound effects
     // In production, you would load actual audio files
     console.log(`Playing rock sound: ${soundType}`);
-    
+
     // For now, just play a beep for demonstration
     // For now, just play a beep for demonstration
     // AudioContext blocked on some browsers without user interaction on the specific element
@@ -1348,16 +1266,16 @@ function playRockSound(soundType) {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.value = 440; // A4 note
             oscillator.type = 'sine';
-            
+
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Lower volume
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
         }
@@ -1376,7 +1294,7 @@ function showTagInfo(genre) {
         '90s Rock': 'Nirvana, Pearl Jam, Soundgarden era',
         'Modern Rock': 'Contemporary rock and indie rock'
     };
-    
+
     if (genreInfo[genre]) {
         showNotification(`${genre}: ${genreInfo[genre]}`, 'info', 3000);
     }
@@ -1392,11 +1310,11 @@ function createGenreInfoModal() {
             </div>
         </div>
     `;
-    
+
     const modal = document.createElement('div');
     modal.innerHTML = modalHTML;
     document.body.appendChild(modal);
-    
+
     // Add styles
     const style = document.createElement('style');
     style.textContent = `
@@ -1477,21 +1395,21 @@ function createGenreInfoModal() {
 function setupParallaxImage() {
     const aboutImage = document.querySelector('#about .image.main img');
     if (!aboutImage) return;
-    
+
     let isInView = false;
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             isInView = entry.isIntersecting;
         });
     }, { threshold: 0.5 });
-    
+
     observer.observe(aboutImage);
-    
+
     // Parallax effect on scroll
     window.addEventListener('scroll', () => {
         if (!isInView) return;
-        
+
         const scrolled = window.pageYOffset;
         const rate = scrolled * -0.3;
         aboutImage.style.transform = `translateY(${rate}px) scale(1.02)`;
@@ -1507,7 +1425,7 @@ function setupTimeline() {
             description: 'Began playing in small Nairobi clubs'
         },
         {
-            year: '2015', 
+            year: '2015',
             title: 'First Major Gig',
             description: 'Headlined at a major Nairobi venue'
         },
@@ -1522,7 +1440,7 @@ function setupTimeline() {
             description: 'Featured in Kenyan music publications'
         }
     ];
-    
+
     // You can dynamically create timeline from this data
 }
 
@@ -1533,7 +1451,7 @@ function setupAboutStats() {
         { icon: '👥', number: '5000+', label: 'Largest Crowd' },
         { icon: '🏆', number: '10+', label: 'Awards & Features' }
     ];
-    
+
     // This can be used to dynamically create stats cards
 }
 
@@ -1552,7 +1470,7 @@ function setupTestimonialSlider() {
             author: "James K., Event Planner"
         }
     ];
-    
+
     // This can be used to create a testimonial slider
 }
 
@@ -1568,9 +1486,9 @@ function initAboutSection() {
 }
 
 // Add to DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // ... existing initialization code ...
-    
+
     // Initialize about section features
     initAboutSection();
 });
@@ -1635,9 +1553,9 @@ function showRockTrivia() {
         "The Gibson Les Paul guitar was originally rejected by Gibson but went on to become one of the most iconic guitars in rock history",
         "AC/DC's 'Back in Black' is the second best-selling album of all time worldwide"
     ];
-    
+
     const randomTrivia = trivia[Math.floor(Math.random() * trivia.length)];
-    
+
     // Show trivia in a subtle way
     const triviaElement = document.createElement('div');
     triviaElement.className = 'rock-trivia';
@@ -1648,7 +1566,7 @@ function showRockTrivia() {
             <button class="close-trivia">&times;</button>
         </div>
     `;
-    
+
     triviaElement.style.cssText = `
         position: fixed;
         bottom: 20px;
@@ -1663,24 +1581,24 @@ function showRockTrivia() {
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         font-weight: bold;
     `;
-    
+
     triviaElement.querySelector('.trivia-content').style.cssText = `
         display: flex;
         align-items: center;
         gap: 0.8rem;
     `;
-    
+
     triviaElement.querySelector('.trivia-icon').style.cssText = `
         font-size: 1.5rem;
         flex-shrink: 0;
     `;
-    
+
     triviaElement.querySelector('.trivia-text').style.cssText = `
         flex: 1;
         font-size: 0.9rem;
         line-height: 1.4;
     `;
-    
+
     triviaElement.querySelector('.close-trivia').style.cssText = `
         background: none;
         border: none;
@@ -1696,18 +1614,18 @@ function showRockTrivia() {
         border-radius: 50%;
         transition: all 0.3s ease;
     `;
-    
-    triviaElement.querySelector('.close-trivia').addEventListener('mouseenter', function() {
+
+    triviaElement.querySelector('.close-trivia').addEventListener('mouseenter', function () {
         this.style.background = 'rgba(0, 0, 0, 0.1)';
     });
-    
-    triviaElement.querySelector('.close-trivia').addEventListener('click', function() {
+
+    triviaElement.querySelector('.close-trivia').addEventListener('click', function () {
         triviaElement.style.animation = 'slideOutRight 0.5s ease';
         setTimeout(() => triviaElement.remove(), 500);
     });
-    
+
     document.body.appendChild(triviaElement);
-    
+
     // Auto-remove after 10 seconds
     setTimeout(() => {
         if (triviaElement.parentNode) {
@@ -1726,33 +1644,33 @@ if (window.location.hash === '#about') {
 function setupContactSection() {
     // Add classes to contact methods for different styling
     styleContactMethods();
-    
+
     // Setup contact form
     setupContactForm();
-    
+
     // Setup social media interactions
     setupSocialInteractions();
-    
+
     // Setup quick actions
     setupQuickActions();
-    
+
     // Setup WhatsApp QR code (optional)
     setupWhatsAppQR();
-    
+
     // Setup click tracking
     setupContactAnalytics();
-    
+
     // Setup email link with fallback
     setupEmailLinks();
 }
 
 function styleContactMethods() {
     const contactMethods = document.querySelectorAll('.contact-method');
-    
+
     contactMethods.forEach(method => {
         const icon = method.querySelector('i');
         if (!icon) return;
-        
+
         // Add specific class based on icon
         if (icon.classList.contains('fa-whatsapp')) {
             method.classList.add('whatsapp');
@@ -1764,9 +1682,9 @@ function styleContactMethods() {
         } else if (icon.classList.contains('fa-ticket-alt')) {
             method.classList.add('tickets');
         }
-        
+
         // Add click sound
-        method.addEventListener('click', function(e) {
+        method.addEventListener('click', function (e) {
             if (e.target.tagName === 'A') {
                 playContactSound(this.className);
             }
@@ -1776,7 +1694,7 @@ function styleContactMethods() {
 
 function addPulseEffect(element) {
     element.style.position = 'relative';
-    
+
     const pulse = document.createElement('div');
     pulse.className = 'pulse-ring';
     pulse.style.cssText = `
@@ -1791,14 +1709,14 @@ function addPulseEffect(element) {
         opacity: 0;
         pointer-events: none;
     `;
-    
+
     element.appendChild(pulse);
-    
-    element.addEventListener('mouseenter', function() {
+
+    element.addEventListener('mouseenter', function () {
         pulse.style.animation = 'pulse 1.5s infinite';
     });
-    
-    element.addEventListener('mouseleave', function() {
+
+    element.addEventListener('mouseleave', function () {
         pulse.style.animation = 'none';
     });
 }
@@ -1810,7 +1728,7 @@ function playContactSound(type) {
         'spotify': 'music_start',
         'tickets': 'cash_register'
     };
-    
+
     // This would play actual sounds in production
     console.log(`Playing ${sounds[type] || 'click'} sound`);
 }
@@ -1818,16 +1736,16 @@ function playContactSound(type) {
 function setupContactForm() {
     const contactForm = document.querySelector('#contact form');
     if (!contactForm) return;
-    
+
     // Setup form validation
     setupContactValidation(contactForm);
-    
+
     // Handle form submission
     contactForm.addEventListener('submit', handleContactSubmit);
-    
+
     // Add character counter
     setupMessageCounter();
-    
+
     // Add auto-save feature
     setupAutoSave();
 }
@@ -1836,7 +1754,7 @@ function setupContactValidation(form) {
     const nameInput = document.getElementById('contact-name');
     const emailInput = document.getElementById('contact-email');
     const messageInput = document.getElementById('contact-message');
-    
+
     // Real-time validation
     [nameInput, emailInput, messageInput].forEach(input => {
         if (input) {
@@ -1844,10 +1762,10 @@ function setupContactValidation(form) {
             input.addEventListener('input', clearContactError);
         }
     });
-    
+
     // Email validation
     if (emailInput) {
-        emailInput.addEventListener('change', function() {
+        emailInput.addEventListener('change', function () {
             if (this.value && !isValidEmail(this.value)) {
                 showContactError(this, 'Please enter a valid email address');
             }
@@ -1857,25 +1775,25 @@ function setupContactValidation(form) {
 
 function validateContactField(e) {
     const field = e.target;
-    
+
     if (field.hasAttribute('required') && !field.value.trim()) {
         showContactError(field, 'This field is required');
         return false;
     }
-    
+
     if (field.type === 'email' && field.value) {
         if (!isValidEmail(field.value)) {
             showContactError(field, 'Please enter a valid email address');
             return false;
         }
     }
-    
+
     return true;
 }
 
 function showContactError(field, message) {
     clearContactError(field);
-    
+
     const error = document.createElement('div');
     error.className = 'contact-error';
     error.textContent = message;
@@ -1889,7 +1807,7 @@ function showContactError(field, message) {
         border-left: 2px solid #ff4444;
         animation: slideDown 0.3s ease;
     `;
-    
+
     field.parentNode.appendChild(error);
     field.style.borderColor = '#ff4444';
 }
@@ -1905,7 +1823,7 @@ function clearContactError(field) {
 function setupMessageCounter() {
     const messageInput = document.getElementById('contact-message');
     if (!messageInput) return;
-    
+
     const counter = document.createElement('div');
     counter.className = 'message-counter';
     counter.style.cssText = `
@@ -1914,14 +1832,14 @@ function setupMessageCounter() {
         color: #888;
         margin-top: 0.3rem;
     `;
-    
+
     messageInput.parentNode.appendChild(counter);
-    
+
     function updateCounter() {
         const length = messageInput.value.length;
         const maxLength = 500;
         counter.textContent = `${length}/${maxLength} characters`;
-        
+
         if (length > maxLength) {
             counter.style.color = '#ff4444';
             messageInput.style.borderColor = '#ff4444';
@@ -1932,7 +1850,7 @@ function setupMessageCounter() {
             messageInput.style.borderColor = '';
         }
     }
-    
+
     messageInput.addEventListener('input', updateCounter);
     messageInput.setAttribute('maxlength', '500');
     updateCounter();
@@ -1941,7 +1859,7 @@ function setupMessageCounter() {
 function setupAutoSave() {
     const form = document.querySelector('#contact form');
     const inputs = form.querySelectorAll('input, textarea');
-    
+
     // Load saved data
     const savedData = JSON.parse(localStorage.getItem('contact_form_draft')) || {};
     inputs.forEach(input => {
@@ -1949,10 +1867,10 @@ function setupAutoSave() {
             input.value = savedData[input.name];
         }
     });
-    
+
     // Auto-save on input
     inputs.forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             const formData = {};
             inputs.forEach(i => {
                 if (i.name) {
@@ -1962,47 +1880,47 @@ function setupAutoSave() {
             localStorage.setItem('contact_form_draft', JSON.stringify(formData));
         });
     });
-    
+
     // Clear draft on successful submission
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function () {
         localStorage.removeItem('contact_form_draft');
     });
 }
 
 async function handleContactSubmit(e) {
     e.preventDefault();
-    
+
     const form = e.target;
     const formData = collectContactFormData(form);
-    
+
     // Validate form
     if (!validateContactForm(form)) {
         showNotification('Please fill in all required fields correctly', 'error');
         return;
     }
-    
+
     // Show loading state
     setContactFormLoading(true);
-    
+
     try {
         // Save message
         saveContactMessage(formData);
-        
+
         // Show success message
         showContactSuccess(formData);
-        
+
         // Send notification (simulated)
         await sendContactNotification(formData);
-        
+
         // Reset form
         form.reset();
-        
+
         // Clear draft
         localStorage.removeItem('contact_form_draft');
-        
+
         // Show success notification
         showNotification('Message sent successfully! I\'ll get back to you soon.', 'success', 5000);
-        
+
     } catch (error) {
         console.error('Contact form error:', error);
         showNotification('There was an error sending your message. Please try again.', 'error');
@@ -2016,28 +1934,28 @@ function collectContactFormData(form) {
         timestamp: new Date().toISOString(),
         type: 'general_inquiry'
     };
-    
+
     const inputs = form.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         if (input.name && input.value) {
             formData[input.name] = input.value;
         }
     });
-    
+
     return formData;
 }
 
 function validateContactForm(form) {
     let isValid = true;
     const requiredFields = ['contact-name', 'contact-email', 'contact-message'];
-    
+
     requiredFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field && !field.value.trim()) {
             showContactError(field, 'This field is required');
             isValid = false;
         }
-        
+
         if (fieldId === 'contact-email' && field.value) {
             if (!isValidEmail(field.value)) {
                 showContactError(field, 'Please enter a valid email address');
@@ -2045,14 +1963,14 @@ function validateContactForm(form) {
             }
         }
     });
-    
+
     return isValid;
 }
 
 function setContactFormLoading(loading) {
     const form = document.querySelector('#contact form');
     const submitBtn = form.querySelector('input[type="submit"]');
-    
+
     if (loading) {
         form.classList.add('loading');
         submitBtn.value = 'Sending...';
@@ -2068,9 +1986,9 @@ function saveContactMessage(messageData) {
     const messages = JSON.parse(localStorage.getItem('contact_messages')) || [];
     messages.push(messageData);
     localStorage.setItem('contact_messages', JSON.stringify(messages));
-    
+
     console.log('Message saved:', messageData);
-    
+
     // TODO: Replace with Supabase integration
     // await supabase.from('contact_messages').insert([messageData]);
 }
@@ -2078,22 +1996,22 @@ function saveContactMessage(messageData) {
 function showContactSuccess(formData) {
     // Create or show success message
     let successElement = document.querySelector('.contact-success');
-    
+
     if (!successElement) {
         successElement = document.createElement('div');
         successElement.className = 'contact-success';
         document.querySelector('#contact form').parentNode.appendChild(successElement);
     }
-    
+
     successElement.innerHTML = `
         <h4>Message Sent Successfully!</h4>
         <p>Thank you <strong>${formData['contact-name']}</strong> for your message. 
         I'll respond to <strong>${formData['contact-email']}</strong> within 24-48 hours.</p>
         <p><small>For urgent inquiries, please contact me directly on WhatsApp.</small></p>
     `;
-    
+
     successElement.classList.add('show');
-    
+
     // Auto-hide after 10 seconds
     setTimeout(() => {
         successElement.classList.remove('show');
@@ -2112,20 +2030,20 @@ async function sendContactNotification(formData) {
 
 function setupSocialInteractions() {
     const socialIcons = document.querySelectorAll('#contact .icons a');
-    
+
     socialIcons.forEach(icon => {
         // Add hover effect
-        icon.addEventListener('mouseenter', function() {
+        icon.addEventListener('mouseenter', function () {
             const iconType = this.querySelector('i').className;
             animateSocialIcon(this, iconType);
         });
-        
+
         // Add click tracking
-        icon.addEventListener('click', function(e) {
+        icon.addEventListener('click', function (e) {
             const platform = this.className.includes('instagram') ? 'instagram' :
-                           this.className.includes('spotify') ? 'spotify' :
-                           this.className.includes('whatsapp') ? 'whatsapp' : 'email';
-            
+                this.className.includes('spotify') ? 'spotify' :
+                    this.className.includes('whatsapp') ? 'whatsapp' : 'email';
+
             trackSocialClick(platform);
         });
     });
@@ -2137,9 +2055,9 @@ function animateSocialIcon(icon, iconType) {
     setTimeout(() => {
         icon.style.animation = '';
     }, 500);
-    
+
     // Platform-specific effects
-    switch(true) {
+    switch (true) {
         case iconType.includes('instagram'):
             icon.style.boxShadow = '0 0 20px rgba(225, 48, 108, 0.5)';
             break;
@@ -2153,7 +2071,7 @@ function animateSocialIcon(icon, iconType) {
             icon.style.boxShadow = '0 0 20px rgba(255, 69, 0, 0.5)';
             break;
     }
-    
+
     // Reset shadow after animation
     setTimeout(() => {
         icon.style.boxShadow = '';
@@ -2167,7 +2085,7 @@ function trackSocialClick(platform) {
         timestamp: new Date().toISOString()
     });
     localStorage.setItem('social_clicks', JSON.stringify(socialClicks));
-    
+
     // TODO: Send to analytics
 }
 
@@ -2182,7 +2100,7 @@ function setupQuickActions() {
             </a>
         </div>
     `;
-    
+
     const contactInfo = document.querySelector('.contact-info');
     if (contactInfo) {
         const actionsDiv = document.createElement('div');
@@ -2209,16 +2127,16 @@ function setupWhatsAppQR() {
                 <p><small>Or click the link above</small></p>
             </div>
         `;
-        
+
         const qrDiv = document.createElement('div');
         qrDiv.innerHTML = qrHTML;
         whatsappMethod.appendChild(qrDiv);
-        
+
         // Toggle QR code on click
         const qrSection = qrDiv.querySelector('.whatsapp-qr');
         qrSection.style.display = 'none';
-        
-        whatsappMethod.addEventListener('click', function(e) {
+
+        whatsappMethod.addEventListener('click', function (e) {
             if (e.target.tagName === 'A') {
                 qrSection.style.display = qrSection.style.display === 'none' ? 'block' : 'none';
             }
@@ -2235,7 +2153,7 @@ function setupContactAnalytics() {
             }
         });
     }, { threshold: 0.5 });
-    
+
     const contactSection = document.getElementById('contact');
     if (contactSection) {
         observer.observe(contactSection);
@@ -2250,24 +2168,24 @@ function trackContactView() {
 
 function setupEmailLinks() {
     const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
-    
+
     emailLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             // Check if default mail client is available
             if (!this.href.startsWith('mailto:')) return;
-            
+
             // Fallback for mobile devices
             if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 // Mobile devices handle mailto links well
                 return;
             }
-            
+
             // Desktop fallback - copy email to clipboard
             e.preventDefault();
             const email = this.href.replace('mailto:', '');
             copyToClipboard(email);
             showNotification(`Email copied to clipboard: ${email}`, 'info', 3000);
-            
+
             // Try to open mail client anyway
             setTimeout(() => {
                 window.location.href = this.href;
@@ -2282,9 +2200,9 @@ function initContactSection() {
 }
 
 // Add to DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // ... existing initialization code ...
-    
+
     // Initialize contact section features
     initContactSection();
 });
@@ -2360,12 +2278,12 @@ document.head.appendChild(contactStyles);
 // Copy phone number functionality
 function setupPhoneCopy() {
     const phoneLinks = document.querySelectorAll('a[href*="tel:"], a[href*="wa.me"]');
-    
+
     phoneLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             // Don't interfere with WhatsApp links
             if (this.href.includes('wa.me')) return;
-            
+
             // For tel: links on desktop, copy to clipboard
             if (this.href.startsWith('tel:') && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
                 e.preventDefault();

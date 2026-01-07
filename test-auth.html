@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <div id="status"></div>
+    <script>
+        const supabase = supabase.createClient(
+            'https://ptoxjmirnqtjdwdzolnt.supabase.co',
+            'sb_publishable_TQzqZImbJ6u1c858SKFI9Q_lyoeM5wF',
+            {
+                auth: { storageKey: 'edygrim-admin-auth' }
+            }
+        );
+        
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            const statusDiv = document.getElementById('status');
+            
+            if (session) {
+                statusDiv.innerHTML = `
+                    <h2 style="color: green;">✅ LOGGED IN</h2>
+                    <p>User: ${session.user.email}</p>
+                    <p><a href="admin-dashboard.html">Go to Dashboard</a></p>
+                    <button onclick="logout()">Logout</button>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <h2 style="color: red;">❌ NOT LOGGED IN</h2>
+                    <p><a href="admin-login.html">Go to Login</a></p>
+                `;
+            }
+            
+            // Check localStorage
+            const authData = localStorage.getItem('edygrim-admin-auth');
+            statusDiv.innerHTML += `
+                <hr>
+                <h3>Local Storage Check:</h3>
+                <p>Storage Key exists: ${authData ? 'YES' : 'NO'}</p>
+                <button onclick="clearStorage()">Clear Storage</button>
+            `;
+        }
+        
+        async function logout() {
+            await supabase.auth.signOut();
+            localStorage.removeItem('edygrim-admin-auth');
+            location.reload();
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Storage cleared!');
+            location.reload();
+        }
+        
+        checkAuth();
+    </script>
+</body>
+</html>

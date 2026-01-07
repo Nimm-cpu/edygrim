@@ -173,11 +173,11 @@ nav a:hover {
 
 /* Gig Cards */
 .gig-card {
-    background: rgba(30, 30, 30, 0.9);
+    background: white;
     padding: 1.5rem;
-    margin: 2rem 0;
-    border-radius: 8px;
-    border: 1px solid #333;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .gig-card h3 {
@@ -954,25 +954,245 @@ nav a.active {
     border: 2px solid #ff4500;
     box-shadow: 0 0 25px rgba(255, 69, 0, 0.3);
 }
-/* Gig Calendar */
-.gig-calendar {
-    background: rgba(255, 69, 0, 0.05);
-    padding: 1.5rem;
-    margin-top: 2rem;
+/* Calendar Styles */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1rem;
     border-radius: 8px;
-    border: 2px dashed #ff4500;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.calendar-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.calendar-nav-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav-btn:hover {
+    background: #5a6fd8;
+    transform: scale(1.1);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e1e1e1;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.calendar-day-header {
+    background: #f8f9fa;
+    padding: 1rem;
     text-align: center;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
 }
 
-.gig-calendar h4 {
-    color: #ff4500;
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 0.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+}
+
+.calendar-day.empty {
+    background: #f8f9fa;
+}
+
+.calendar-day-number {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.calendar-day.today .calendar-day-number {
+    background: #667eea;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-gig {
+    background: #667eea;
+    color: white;
+    padding: 3px 6px;
+    margin-top: 20px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.calendar-gig:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.calendar-gig.completed {
+    background: #28a745;
+}
+
+.calendar-gig.cancelled {
+    background: #dc3545;
+    opacity: 0.7;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
     margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    color: #555;
+    font-weight: 500;
 }
 
-.gig-calendar p {
-    color: #888;
-    font-size: 0.9rem;
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e1e1e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e1e1e1;
+}
+
+/* Gig Status Badges */
+.status-upcoming {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
 }
 
 /* Responsive Design for these sections */
@@ -1208,10 +1428,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 /* About Section */
 #about {
-    background: linear-gradient(145deg, rgba(10, 10, 10, 0.9), rgba(30, 30, 30, 0.9));
+    background: linear-gradient(145deg, rgba(10, 10, 10, 0.374), rgba(121, 60, 60, 0.301));
     border: 2px solid #bd5833;
     box-shadow: 0 0 40px rgba(56, 24, 13, 0.2);
-    background-image: url(footer2.webp);
+    background-image: url(footer4.webp);
 }
 
 #about .image.main img {
@@ -2224,4 +2444,170 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         background-position: center !important;
         background-attachment: scroll !important;
     }
+}
+
+/* Booking form success message */
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+/* WhatsApp button styling */
+.whatsapp-btn {
+    background: #25D366;
+    color: white;
+}
+
+.whatsapp-btn:hover {
+    background: #128C7E;
+}
+
+/* Gig cards */
+.gig-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.gig-calendar {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Fix missing background images */
+#bg {
+    background: #1c1d26; /* Solid color instead of missing image */
+}
+
+/* Or if you want to keep the overlay effect without the image */
+.image.main img {
+    width: 100%;
+    height: auto;
+}
+
+/* Fix any other missing image references */
+body {
+    background: #1c1d26;
+}
+
+/* Admin footer styles */
+.admin-footer-link {
+    font-size: 0.9rem;
+    color: #888;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.admin-footer-link:hover {
+    color: #4CAF50;
+}
+
+.admin-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.admin-button {
+    padding: 0.3rem 0.8rem;
+    background: #333;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: background 0.3s ease;
+}
+
+.admin-button:hover {
+    background: #4CAF50;
+    color: white;
+}
+
+.admin-email {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* Public Gigs Styles */
+.gigs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.gig-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.gig-item:hover {
+    transform: translateY(-2px);
+}
+
+.gig-date {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-align: center;
+    margin-right: 1rem;
+    min-width: 70px;
+}
+
+.gig-day {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.gig-month {
+    display: block;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gig-info h5 {
+    margin: 0 0 0.25rem 0;
+    color: #333;
+}
+
+.gig-venue {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.gig-time {
+    margin: 0.25rem 0 0 0;
+    color: #667eea;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.no-gigs {
+    text-align: center;
+    padding: 2rem;
+}
+
+.no-gigs .button {
+    display: inline-block;
+    margin-top: 1rem;
 }
